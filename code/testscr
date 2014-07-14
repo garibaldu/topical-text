@@ -1,0 +1,8 @@
+basedir='./texts/bible-by-chaps'
+
+python topic-gibbs.py ${basedir}/cDW.csv  6 100
+python clouds_from_cWT.py ${basedir}/cWT.csv  test-myGibbs 100 30
+
+java Gibbs ${basedir}/cDW.csv  6 100
+python clouds_from_cWT.py ${basedir}/cWT.csv  test-annaGibbs 100 30
+

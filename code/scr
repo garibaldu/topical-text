@@ -1,0 +1,14 @@
+basedir='./texts/GreatExpectations'
+startdoc='GreatExpectations.txt'
+numwords=400
+
+python choose_vocabulary.py  ${basedir}/original/${startdoc}  ${basedir}/INZ_stopwords.txt  ${numwords}
+
+python build_cDW_matrix_from_multiple_docs.py  ${basedir}/docs ${basedir}/original/vocab_${numwords}.txt
+
+mv ${basedir}/docs/cDW.csv  ${basedir}/cDW.csv  
+
+python topic-gibbs.py ${basedir}/cDW.csv  5 100
+
+python clouds_from_cWT.py ${basedir}/cWT.csv  test 100 50
+

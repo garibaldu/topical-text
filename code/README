@@ -1,0 +1,65 @@
+
+Setup for a new corpus.
+The example here is "brave" (brave new world).
+
+If it's a single text that's going to be split up into "chapters", make a subdirectory in ./texts/ of a suitable name, and put the .txt file in there.
+
+If I was splitting up brave.txt (which has "Chapter One", "Chapter Two" and so on) I would then do this to split it:
+
+>  python   splitter.py   ./texts/brave/brave.txt   Chapter
+
+This puts the "Chapters" into that same directory, and appends "_01", "_02" etc to each sub-part. These are going to be the documents then. 
+
+Now we build a vocabulary that's appropriate to the genre. I've done this by taking the original document (the big one) and...
+
+>  python choose_vocabulary.py  ./texts/brave/brave.txt  100
+
+That writes a file consisting of a set of words to brave.vocab in the same directory.
+If there's no single originating doc, you'd want to do this by taking a suitably large number of chunks instead. Or attempt something smarter :-)
+
+
+At this point any originating (single big) doc should be moved to a subdirectory "original", say, to avoid confusion. I do this:
+>  mkdir ./texts/brave/original
+>  mv ./texts/brave/brave.txt ./texts/brave/original/
+So the only ".txt" files in the main directory are those documents we want to analyse.
+
+
+
+
+Next, we build a big cDW matrix (the gray slab in my gorgeous diagram) from all those docs, like this:
+
+>  python build_cDW_matrix_from_multiple_docs.py  ./texts/brave  ./texts/brave/brave.vocab 
+
+That results in brave_cDW.csv in the obvious directory.  NB: At this
+point, all the info that LDA needs is in that new .csv file, so one
+could safely make a new "docs" directory and move all the .txt files
+into there for the sake of being tidy.
+
+
+At last we're ready to run LDA / Gibbs Sampling on that data then. 
+Do this with:
+
+>   python topic-gibbs.py   ./texts/brave/brave_cDW.csv 3  100
+OR
+>   java Gibbs   ./texts/brave/brave_cDW.csv 3  100
+
+if you want 3 topics and 100 iterations of Gibbs.
+That writes two csv files with the results, in the usual directory. In this case they'd be
+
+brave_cDT.csv   - these are raw counts, not normalised.
+brave_cWT.csv  - these are not normalised.
+
+You can then inspect those with a spreadsheet.
+
+The most "iconic" words aren't those with high prob(word | topic) though.
+They're the ones with entry in Pr(topic | word) that is substantial. 
+So topic-gibbs.py ends by saving the most iconic words (the ones shown in stdout as Gibbs is running) to
+brave_topic-specific_words.txt too.
+
+
+--------------------------------------------------------------
+Running with the cython version:
+1) install  requirements ('sudo apt-get install cython python-dev')
+2) run make [this assumes that /usr/include/python2.7 ..adjust as appropriate]
+3) To get the cythonised version, edit the import line in topic-gibbs to import the gibbs updater from gibbs_iteration_c, e.g. "from gibbs_iteration_c import run_GibbsSamplerIteration"
+
