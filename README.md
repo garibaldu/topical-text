@@ -1,4 +1,4 @@
 topical-text
 ============
 
-managing that topical infection
+exploring topics on ideas about ideas on topics, especially novelty and unusuality.
