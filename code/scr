@@ -1,14 +1,15 @@
-basedir='./texts/GreatExpectations'
-startdoc='GreatExpectations.txt'
-numwords=400
+basedir='./texts/greatexpectations'
+startdoc='expectations.txt'
+numwords=1000
+numtopics=15
+splitterstring='Chapter'
 
-python choose_vocabulary.py  ${basedir}/original/${startdoc}  ${basedir}/INZ_stopwords.txt  ${numwords}
 
-python build_cDW_matrix_from_multiple_docs.py  ${basedir}/docs ${basedir}/original/vocab_${numwords}.txt
-
+python  splitter.py  ${basedir}/original/${startdoc}  ${basedir}/docs   ${splitterstring}
+python choose_vocabulary.py  ${basedir}/docs   ./nowords.txt  ${numwords}
+mv  ${basedir}/docs/vocab.txt   ${basedir}/vocab_${numwords}.txt   
+python build_cDW_matrix_from_multiple_docs.py  ${basedir}/docs  ${basedir}/vocab_${numwords}.txt
 mv ${basedir}/docs/cDW.csv  ${basedir}/cDW.csv  
-
-python topic-gibbs.py ${basedir}/cDW.csv  5 100
-
-python clouds_from_cWT.py ${basedir}/cWT.csv  test 100 50
-
+javac Gibbs.java
+java Gibbs ${basedir}/cDW.csv  ${numtopics}  100
+python wordclouds_from_cWT.py ${basedir}/cWT.csv   ${basedir}/topics_${numtopics} 50
